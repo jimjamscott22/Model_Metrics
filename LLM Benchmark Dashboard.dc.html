@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <template id="__bundler_thumbnail" data-bg-color="#fafaf9">
+    <svg viewBox="0 0 120 84" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="84" fill="#fafaf9"/>
+      <rect x="14" y="18" width="60" height="8" rx="4" fill="#3fae7a"/>
+      <rect x="14" y="34" width="80" height="8" rx="4" fill="#e07a3f"/>
+      <rect x="14" y="50" width="45" height="8" rx="4" fill="#3f7ae0"/>
+      <rect x="14" y="66" width="30" height="8" rx="4" fill="#c23f5e"/>
+    </svg>
+  </template>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    @keyframes barGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    body { margin: 0; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh; width:100%; background:oklch(0.985 0.003 95); font-family:'Inter',system-ui,sans-serif; color:oklch(0.22 0.01 95); box-sizing:border-box;">
+
+  <!-- Header -->
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:24px; padding:28px 40px; border-bottom:1px solid oklch(0.9 0.005 95);">
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div style="width:38px; height:38px; border-radius:10px; background:oklch(0.22 0.01 95); display:flex; align-items:center; justify-content:center; flex:none;">
+        <div style="width:16px; height:16px; border-radius:4px; background:linear-gradient(135deg, oklch(0.68 0.19 260), oklch(0.68 0.19 20));"></div>
+      </div>
+      <div>
+        <div style="font-size:19px; font-weight:800; letter-spacing:-0.01em; line-height:1.2;">LLM Benchmark Leaderboard</div>
+        <div style="font-size:13px; color:oklch(0.5 0.01 95); margin-top:1px;">Frontier &amp; open-weight models, ranked across key evals</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="display:flex; align-items:center; gap:7px; padding:7px 12px; border-radius:100px; background:oklch(0.96 0.01 145); border:1px solid oklch(0.85 0.04 145);">
+        <div style="width:7px; height:7px; border-radius:50%; background:oklch(0.6 0.16 145);"></div>
+        <span style="font-size:12.5px; font-weight:600; color:oklch(0.4 0.08 145);">{{ dataSourceLabel }} &middot; {{ lastUpdated }}</span>
+      </div>
+      <div style="font-size:12px; color:oklch(0.55 0.01 95); padding:7px 12px; border-radius:100px; border:1px dashed oklch(0.82 0.005 95);">
+        Daily API sync coming soon
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="padding:24px 40px 0;">
+    <div style="display:inline-flex; gap:4px; padding:4px; background:oklch(0.95 0.005 95); border-radius:12px;">
+      <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+        <div
+          onClick="{{ tab.onClick }}"
+          style="{{ tab.style }}"
+        >{{ tab.label }}</div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div style="display:grid; grid-template-columns:1fr 320px; gap:20px; padding:24px 40px 40px; align-items:start;">
+
+    <!-- Chart card -->
+    <div style="background:oklch(1 0 0); border:1px solid oklch(0.91 0.005 95); border-radius:16px; padding:28px 28px 20px; box-shadow:0 1px 2px oklch(0.2 0.01 95 / 0.04);">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px;">
+        <div style="font-size:15px; font-weight:700;">{{ chartTitle }}</div>
+        <div style="font-size:12.5px; color:oklch(0.55 0.01 95);">{{ chartUnit }}</div>
+      </div>
+
+      <sc-if value="{{ isCostSpeed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+          <div>
+            <div style="font-size:12.5px; font-weight:600; color:oklch(0.5 0.01 95); margin-bottom:14px; text-transform:uppercase; letter-spacing:0.04em;">Cost &middot; $ / 1M tokens (blended)</div>
+            <sc-for list="{{ costRows }}" as="row" hint-placeholder-count="10">
+              <div
+                onMouseEnter="{{ row.onEnter }}"
+                onMouseLeave="{{ row.onLeave }}"
+                style="{{ row.rowStyle }}"
+              >
+                <div style="width:16px; font-size:12px; font-weight:600; color:oklch(0.55 0.01 95); flex:none;">{{ row.rank }}</div>
+                <div style="width:8px; height:8px; border-radius:50%; flex:none; background:{{ row.color }};"></div>
+                <div style="width:112px; flex:none; overflow:hidden;">
+                  <div style="font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.name }}</div>
+                </div>
+                <div style="flex:1; height:16px; background:oklch(0.96 0.004 95); border-radius:5px; overflow:hidden; position:relative;">
+                  <div style="{{ row.barStyle }}"></div>
+                </div>
+                <div style="width:56px; text-align:right; font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace; flex:none;">{{ row.valueLabel }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div>
+            <div style="font-size:12.5px; font-weight:600; color:oklch(0.5 0.01 95); margin-bottom:14px; text-transform:uppercase; letter-spacing:0.04em;">Speed &middot; output tok/sec</div>
+            <sc-for list="{{ speedRows }}" as="row" hint-placeholder-count="10">
+              <div
+                onMouseEnter="{{ row.onEnter }}"
+                onMouseLeave="{{ row.onLeave }}"
+                style="{{ row.rowStyle }}"
+              >
+                <div style="width:16px; font-size:12px; font-weight:600; color:oklch(0.55 0.01 95); flex:none;">{{ row.rank }}</div>
+                <div style="width:8px; height:8px; border-radius:50%; flex:none; background:{{ row.color }};"></div>
+                <div style="width:112px; flex:none; overflow:hidden;">
+                  <div style="font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.name }}</div>
+                </div>
+                <div style="flex:1; height:16px; background:oklch(0.96 0.004 95); border-radius:5px; overflow:hidden; position:relative;">
+                  <div style="{{ row.barStyle }}"></div>
+                </div>
+                <div style="width:56px; text-align:right; font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace; flex:none;">{{ row.valueLabel }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSingleMetric }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <sc-for list="{{ mainRows }}" as="row" hint-placeholder-count="10">
+            <div
+              onMouseEnter="{{ row.onEnter }}"
+              onMouseLeave="{{ row.onLeave }}"
+              style="{{ row.rowStyle }}"
+            >
+              <div style="width:20px; font-size:13px; font-weight:700; color:oklch(0.55 0.01 95); flex:none;">{{ row.rank }}</div>
+              <div style="width:9px; height:9px; border-radius:50%; flex:none; background:{{ row.color }};"></div>
+              <div style="width:190px; flex:none; overflow:hidden;">
+                <div style="font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.name }}</div>
+                <div style="font-size:11px; color:oklch(0.55 0.01 95); font-weight:500;">{{ row.lab }}</div>
+              </div>
+              <div style="flex:1; height:26px; background:oklch(0.96 0.004 95); border-radius:6px; overflow:hidden; position:relative;">
+                <div style="{{ row.barStyle }}"></div>
+              </div>
+              <div style="width:64px; text-align:right; font-size:13.5px; font-weight:700; font-family:'JetBrains Mono',monospace; flex:none;">{{ row.valueLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- Side panel -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <!-- Detail card -->
+      <div style="background:oklch(1 0 0); border:1px solid oklch(0.91 0.005 95); border-radius:16px; padding:22px; box-shadow:0 1px 2px oklch(0.2 0.01 95 / 0.04);">
+        <div style="font-size:11.5px; font-weight:600; color:oklch(0.55 0.01 95); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">{{ detail.tagline }}</div>
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:4px;">
+          <div style="width:11px; height:11px; border-radius:50%; background:{{ detail.color }}; flex:none;"></div>
+          <div style="font-size:18px; font-weight:800; letter-spacing:-0.01em;">{{ detail.name }}</div>
+        </div>
+        <div style="font-size:12.5px; color:oklch(0.5 0.01 95); margin-bottom:16px;">{{ detail.lab }} &middot; released {{ detail.released }}</div>
+
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid oklch(0.94 0.004 95);">
+            <span style="font-size:12.5px; color:oklch(0.5 0.01 95);">Overall (Arena Elo)</span>
+            <span style="font-size:13px; font-weight:700; font-family:'JetBrains Mono',monospace;">{{ detail.overall }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid oklch(0.94 0.004 95);">
+            <span style="font-size:12.5px; color:oklch(0.5 0.01 95);">Coding (SWE-bench Verified)</span>
+            <span style="font-size:13px; font-weight:700; font-family:'JetBrains Mono',monospace;">{{ detail.coding }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid oklch(0.94 0.004 95);">
+            <span style="font-size:12.5px; color:oklch(0.5 0.01 95);">Long-context &amp; agentic</span>
+            <span style="font-size:13px; font-weight:700; font-family:'JetBrains Mono',monospace;">{{ detail.longctx }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid oklch(0.94 0.004 95);">
+            <span style="font-size:12.5px; color:oklch(0.5 0.01 95);">Cost / 1M tok</span>
+            <span style="font-size:13px; font-weight:700; font-family:'JetBrains Mono',monospace;">{{ detail.cost }}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-top:1px solid oklch(0.94 0.004 95);">
+            <span style="font-size:12.5px; color:oklch(0.5 0.01 95);">Speed</span>
+            <span style="font-size:13px; font-weight:700; font-family:'JetBrains Mono',monospace;">{{ detail.speed }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div style="background:oklch(1 0 0); border:1px solid oklch(0.91 0.005 95); border-radius:16px; padding:20px 22px; box-shadow:0 1px 2px oklch(0.2 0.01 95 / 0.04);">
+        <div style="font-size:11.5px; font-weight:600; color:oklch(0.55 0.01 95); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;">Labs</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <sc-for list="{{ labs }}" as="lab" hint-placeholder-count="7">
+            <div style="display:flex; align-items:center; gap:9px;">
+              <div style="width:8px; height:8px; border-radius:50%; flex:none; background:{{ lab.color }};"></div>
+              <span style="font-size:12.5px; font-weight:500; color:oklch(0.3 0.01 95);">{{ lab.name }}</span>
+              <span style="font-size:11.5px; color:oklch(0.6 0.01 95); margin-left:auto;">{{ lab.openLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="padding:0 40px 32px; font-size:11.5px; color:oklch(0.6 0.01 95); max-width:640px; line-height:1.5;">
+    Curated snapshot compiled from public leaderboard reporting (Arena, SWE-bench Verified, provider disclosures). Scores are directional, not exact — labs use different harnesses and self-reported numbers can shift week to week. Live API refresh is the next milestone for this dashboard.
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const MODELS = [
+  { id:'gpt55',    name:'GPT-5.5',           lab:'OpenAI',     open:false, hue:150, released:'Apr 2026', overall:1522, coding:90.4, longctx:88, cost:8.50,  speed:95  },
+  { id:'opus48',   name:'Claude Opus 4.8',   lab:'Anthropic',  open:false, hue:35,  released:'May 2026', overall:1541, coding:93.8, longctx:91, cost:12.00, speed:78  },
+  { id:'gem31',    name:'Gemini 3.1 Pro',    lab:'Google',     open:false, hue:220, released:'Feb 2026', overall:1498, coding:87.2, longctx:95, cost:7.00,  speed:130 },
+  { id:'grok41',   name:'Grok 4.1',          lab:'xAI',        open:false, hue:0,   released:'Mar 2026', overall:1472, coding:82.5, longctx:80, cost:6.50,  speed:145 },
+  { id:'llama4',   name:'Llama 4 Scout',     lab:'Meta',       open:true,  hue:255, released:'Jan 2026', overall:1410, coding:61.3, longctx:72, cost:0.35,  speed:260 },
+  { id:'deepseek', name:'DeepSeek V4',       lab:'DeepSeek',   open:true,  hue:190, released:'Feb 2026', overall:1449, coding:78.6, longctx:76, cost:0.55,  speed:110 },
+  { id:'qwen37',   name:'Qwen 3.7 Max',      lab:'Alibaba',    open:true,  hue:290, released:'Apr 2026', overall:1438, coding:74.1, longctx:74, cost:0.60,  speed:120 },
+  { id:'glm52',    name:'GLM-5.2',           lab:'Zhipu',      open:true,  hue:95,  released:'May 2026', overall:1421, coding:70.8, longctx:70, cost:0.50,  speed:115 },
+  { id:'minimax',  name:'MiniMax M2.5',      lab:'MiniMax',    open:true,  hue:325, released:'Mar 2026', overall:1405, coding:68.2, longctx:68, cost:0.45,  speed:135 },
+  { id:'mistral3', name:'Mistral Large 3',   lab:'Mistral AI', open:true,  hue:60,  released:'Jan 2026', overall:1415, coding:65.7, longctx:71, cost:2.20,  speed:100 }
+];
+
+function colorFor(hue) { return 'oklch(0.62 0.17 ' + hue + ')'; }
+
+// ---- API wiring ----------------------------------------------------------
+// Point this at your backend once it's live. Expected response: JSON array of
+// objects shaped like the MODELS entries above (id, name, lab, open, hue,
+// released, overall, coding, longctx, cost, speed). hue (0-360) drives each
+// model's color; omit fields you don't have and the UI will just show blanks.
+const BENCHMARK_API_URL = ''; // e.g. 'https://api.yourapp.com/v1/benchmarks/latest'
+
+async function fetchModelsFromApi(url) {
+  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error('Benchmark API returned ' + res.status);
+  const data = await res.json();
+  if (!Array.isArray(data) || !data.length) throw new Error('Benchmark API returned no models');
+  return data;
+}
+
+const TABS = [
+  { key:'overall',   label:'Overall',                 metric:'overall',  fmt:v=>String(v),        unit:'Arena Elo (crowd-sourced pairwise votes)' },
+  { key:'coding',    label:'Coding',                   metric:'coding',   fmt:v=>v.toFixed(1)+'%', unit:'SWE-bench Verified, resolve rate' },
+  { key:'longctx',   label:'Long-Context & Agentic',   metric:'longctx',  fmt:v=>v.toFixed(0),     unit:'Composite score, 0\u2013100' },
+  { key:'costspeed', label:'Cost & Speed',             metric:null,       fmt:null,                unit:'$ blended in+out, tokens/sec' }
+];
+
+class Component extends DCLogic {
+  state = {
+    activeTab: 'overall',
+    hoveredId: null,
+    models: MODELS,
+    dataSource: 'snapshot', // 'snapshot' | 'loading' | 'live' | 'error'
+    lastUpdated: 'Jul 3, 2026'
+  };
+
+  componentDidMount() {
+    if (!BENCHMARK_API_URL) return; // no endpoint configured yet — keep the snapshot
+    this.setState({ dataSource: 'loading' });
+    fetchModelsFromApi(BENCHMARK_API_URL)
+      .then(models => this.setState({
+        models,
+        dataSource: 'live',
+        lastUpdated: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      }))
+      .catch(err => {
+        console.warn('Falling back to snapshot data:', err);
+        this.setState({ models: MODELS, dataSource: 'error' });
+      });
+  }
+
+  renderVals() {
+    const MODELS = this.state.models;
+    const activeTab = this.state.activeTab;
+    const tabDef = TABS.find(t => t.key === activeTab);
+    const isCostSpeed = activeTab === 'costspeed';
+    const isSingleMetric = !isCostSpeed;
+
+    const tabs = TABS.map(t => ({
+      label: t.label,
+      onClick: () => this.setState({ activeTab: t.key }),
+      style: `padding:9px 16px; border-radius:9px; font-size:13px; font-weight:600; cursor:pointer; transition:background 0.15s, color 0.15s; white-space:nowrap; ` +
+        (t.key === activeTab
+          ? `background:oklch(1 0 0); color:oklch(0.2 0.01 95); box-shadow:0 1px 2px oklch(0.2 0.01 95 / 0.08);`
+          : `background:transparent; color:oklch(0.5 0.01 95);`)
+    }));
+
+    const makeRow = (m, value, max, rank, fmt, big) => {
+      const isHover = this.state.hoveredId === m.id;
+      const pct = Math.max(4, Math.min(100, (value / max) * 100));
+      return {
+        rank: rank + 1,
+        name: m.name,
+        lab: m.lab,
+        color: colorFor(m.hue),
+        valueLabel: fmt(value),
+        onEnter: () => this.setState({ hoveredId: m.id }),
+        onLeave: () => this.setState({ hoveredId: null }),
+        rowStyle: `display:flex; align-items:center; gap:${big ? 12 : 10}px; padding:${big ? 7 : 5}px 8px; margin:0 -8px; border-radius:9px; cursor:pointer; background:${isHover ? 'oklch(0.97 0.006 95)' : 'transparent'}; transition:background 0.12s;`,
+        barStyle: `position:absolute; inset:0; width:${pct}%; border-radius:inherit; background:${colorFor(m.hue)}; opacity:${isHover ? 1 : 0.85}; transition:width 0.5s cubic-bezier(.2,.8,.2,1), opacity 0.15s;`
+      };
+    };
+
+    let mainRows = [], costRows = [], speedRows = [];
+
+    if (isSingleMetric) {
+      const metric = tabDef.metric;
+      const sorted = [...MODELS].sort((a, b) => b[metric] - a[metric]);
+      const max = sorted[0][metric];
+      mainRows = sorted.map((m, i) => makeRow(m, m[metric], max, i, tabDef.fmt, true));
+    } else {
+      const sortedCost = [...MODELS].sort((a, b) => a.cost - b.cost);
+      const maxCost = Math.max(...MODELS.map(m => m.cost));
+      costRows = sortedCost.map((m, i) => makeRow(m, m.cost, maxCost, i, v => '$' + v.toFixed(2), false));
+
+      const sortedSpeed = [...MODELS].sort((a, b) => b.speed - a.speed);
+      const maxSpeed = Math.max(...MODELS.map(m => m.speed));
+      speedRows = sortedSpeed.map((m, i) => makeRow(m, m.speed, maxSpeed, i, v => v.toFixed(0), false));
+    }
+
+    const hovered = MODELS.find(m => m.id === this.state.hoveredId);
+    const fallback = isSingleMetric && mainRows.length ? MODELS.find(m => m.id === [...MODELS].sort((a,b)=>b[tabDef.metric]-a[tabDef.metric])[0].id) : MODELS[1];
+    const d = hovered || fallback || MODELS[0];
+
+    const labsSeen = {};
+    const labs = [];
+    MODELS.forEach(m => {
+      if (!labsSeen[m.lab]) {
+        labsSeen[m.lab] = true;
+        labs.push({ name: m.lab, color: colorFor(m.hue), openLabel: m.open ? 'open' : '' });
+      }
+    });
+
+    return {
+      lastUpdated: this.state.lastUpdated,
+      dataSourceLabel: this.state.dataSource === 'live' ? 'Live'
+        : this.state.dataSource === 'loading' ? 'Loading\u2026'
+        : this.state.dataSource === 'error' ? 'Snapshot (API unreachable)'
+        : 'Snapshot',
+      tabs,
+      chartTitle: tabDef.label,
+      chartUnit: tabDef.unit,
+      isCostSpeed,
+      isSingleMetric,
+      mainRows,
+      costRows,
+      speedRows,
+      labs,
+      detail: {
+        tagline: hovered ? 'Now viewing' : 'Category leader',
+        name: d.name,
+        lab: d.lab,
+        released: d.released,
+        color: colorFor(d.hue),
+        overall: d.overall,
+        coding: d.coding.toFixed(1) + '%',
+        longctx: d.longctx,
+        cost: '$' + d.cost.toFixed(2),
+        speed: d.speed.toFixed(0) + ' tok/s'
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>
