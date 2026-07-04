@@ -4,7 +4,7 @@ A clean, single-file dashboard that ranks frontier and open-weight language mode
 
 Built as a self-contained HTML file: no build step, no dependencies to install, no framework to configure. Open it in a browser and it runs. Point it at an API and it goes live.
 
-![Dashboard: horizontal bar leaderboard with per-lab colors, tab switcher, and a hover detail panel](docs/preview.png)
+![Dashboard: horizontal bar leaderboard with per-lab colors, tab switcher, and a hover detail panel](img/Model-Metrics.png)
 
 ---
 
