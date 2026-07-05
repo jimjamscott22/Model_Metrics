@@ -220,7 +220,7 @@ function colorFor(hue) { return 'oklch(0.62 0.17 ' + hue + ')'; }
 // objects shaped like the MODELS entries above (id, name, lab, open, hue,
 // released, overall, coding, longctx, cost, speed). hue (0-360) drives each
 // model's color; omit fields you don't have and the UI will just show blanks.
-const BENCHMARK_API_URL = ''; // e.g. 'https://api.yourapp.com/v1/benchmarks/latest'
+const BENCHMARK_API_URL = '/v1/benchmarks/latest'; // relative: works once served by the FastAPI backend
 
 async function fetchModelsFromApi(url) {
   const res = await fetch(url, { headers: { Accept: 'application/json' } });

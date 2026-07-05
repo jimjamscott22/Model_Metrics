@@ -21,27 +21,37 @@ Built as a self-contained HTML file: no build step, no dependencies to install, 
 
 ## Quick start
 
-**Just want to look at it?** Open `LLM Benchmark Dashboard (standalone).html` in any modern browser. Done.
+**Run the full app (live data):**
 
-**Want to edit it?** Edit `LLM Benchmark Dashboard.dc.html` — it holds the template and logic in a readable form. The `(standalone).html` file is the bundled, offline-ready build.
+```bash
+cd backend
+uv sync
+uv run uvicorn app.main:app --reload
+```
+
+Then open **<http://127.0.0.1:8000/>** — the backend serves the dashboard itself, wired to its own `/v1/benchmarks/latest` endpoint. One process, one URL, no manual editing.
+
+**Just want to look at it offline (snapshot data)?** Open `LLM Benchmark Dashboard (standalone).html` directly in a browser instead — no backend needed.
+
+**Want to edit it?** Edit `LLM Benchmark Dashboard.dc.html` — it holds the template and logic in a readable form. The `(standalone).html` file is the bundled build that the backend serves; it's not regenerated automatically, so mirror any logic changes into it too.
 
 ---
 
-## Wiring in live data
+## How the backend wiring works
 
-The dashboard is designed to swap its built-in snapshot for live data from your own backend with a one-line change.
+`backend/app/main.py` does two things:
 
-1. Open the logic section and set the endpoint:
+- Serves the API: `GET /v1/benchmarks/latest` (see `app/routers/benchmarks.py`), returning the data in `app/data.py` shaped per `app/schemas.py`.
+- Serves the dashboard: `GET /` returns `LLM Benchmark Dashboard (standalone).html` directly, so the page and the API share an origin.
 
-   ```js
-   const BENCHMARK_API_URL = 'https://api.yourapp.com/v1/benchmarks/latest';
-   ```
+The dashboard's `BENCHMARK_API_URL` is set to the relative path `/v1/benchmarks/latest`, so it resolves against whatever origin serves the page — no host/port to hardcode. On load it shows a **Loading…** badge, then flips to **Live** once the fetch resolves. If the API is unreachable, it falls back to the bundled snapshot and shows **Snapshot (API unreachable)**.
 
-2. Have your endpoint return a JSON array of model objects (`id`, `name`, `lab`, `open`, `hue`, `released`, `overall`, `coding`, `longctx`, `cost`, `speed`).
+Useful checks while the server is running:
 
-On load, the dashboard fetches the endpoint, shows a **Loading…** badge, then swaps in live data and flips to **Live**. If the fetch fails it falls back to the bundled snapshot and shows **Snapshot (API unreachable)**.
+- `curl http://127.0.0.1:8000/health` — liveness check
+- <http://127.0.0.1:8000/docs> — interactive API docs
 
-See **[API Integration Guide.md](API%20Integration%20Guide.md)** for the exact response shape, a field-by-field table, CORS notes, timestamp handling, and an optional daily auto-refresh snippet.
+See **[API Integration Guide](docs/API-Integration-Guide.md)** for the exact response shape, a field-by-field table, CORS notes, timestamp handling, and an optional daily auto-refresh snippet.
 
 ---
 
@@ -53,10 +63,16 @@ The bundled numbers are a **curated snapshot** compiled from public leaderboard 
 
 ## Project structure
 
-```
-LLM Benchmark Dashboard.dc.html        # Editable source (template + logic)
+```text
+LLM Benchmark Dashboard.dc.html            # Editable source (template + logic)
 LLM Benchmark Dashboard (standalone).html  # Bundled, offline-ready build
-API Integration Guide.md               # How to connect a live backend
+docs/API-Integration-Guide.md              # How to connect a live backend
+backend/                                   # FastAPI app serving live benchmark data
+  app/main.py                              # App entrypoint, CORS, /health
+  app/routers/benchmarks.py                # GET /v1/benchmarks/latest
+  app/data.py                              # Snapshot data served by the API
+  app/schemas.py                           # Pydantic response schema
+  tests/                                   # pytest suite
 ```
 
 ---
