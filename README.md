@@ -26,10 +26,10 @@ Built as a self-contained HTML file: no build step, no dependencies to install, 
 ```bash
 cd backend
 uv sync
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --reload --port 8420
 ```
 
-Then open **<http://127.0.0.1:8000/>** — the backend serves the dashboard itself, wired to its own `/v1/benchmarks/latest` endpoint. One process, one URL, no manual editing.
+Then open **<http://127.0.0.1:8420/>** — the backend serves the dashboard itself, wired to its own `/v1/benchmarks/latest` endpoint. One process, one URL, no manual editing.
 
 **Just want to look at it offline (snapshot data)?** Open `LLM Benchmark Dashboard (standalone).html` directly in a browser instead — no backend needed.
 
@@ -48,8 +48,8 @@ The dashboard's `BENCHMARK_API_URL` is set to the relative path `/v1/benchmarks/
 
 Useful checks while the server is running:
 
-- `curl http://127.0.0.1:8000/health` — liveness check
-- <http://127.0.0.1:8000/docs> — interactive API docs
+- `curl http://127.0.0.1:8420/health` — liveness check
+- <http://127.0.0.1:8420/docs> — interactive API docs
 
 See **[API Integration Guide](docs/API-Integration-Guide.md)** for the exact response shape, a field-by-field table, CORS notes, timestamp handling, and an optional daily auto-refresh snippet.
 
