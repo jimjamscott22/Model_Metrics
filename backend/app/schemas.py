@@ -15,5 +15,8 @@ class BenchmarkModel(BaseModel):
     overall: float = Field(..., description="Overall score (Arena Elo)")
     coding: float = Field(..., description="SWE-bench Verified resolve rate, %")
     longctx: float = Field(..., description="Long-context & agentic composite, 0-100")
+    reasoning: float = Field(..., description="Reasoning & logic resolve rate (MATH/GPQA composite), %")
+    vision: float = Field(..., description="Vision & multimodal benchmark score (MMMU/VQAv2 composite), %")
+    context: int = Field(..., description="Maximum supported context window size, in tokens")
     cost: float = Field(..., description="Blended cost, $ per 1M tokens")
     speed: float = Field(..., description="Output speed, tokens/sec")

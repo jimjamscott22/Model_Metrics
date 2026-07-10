@@ -11,11 +11,11 @@ def test_get_latest_benchmarks_returns_expected_shape():
 
     models = response.json()
     assert isinstance(models, list)
-    assert len(models) > 0
+    assert len(models) == 15
 
     expected_fields = {
         "id", "name", "lab", "open", "hue", "released",
-        "overall", "coding", "longctx", "cost", "speed",
+        "overall", "coding", "longctx", "reasoning", "vision", "context", "cost", "speed",
     }
     assert expected_fields.issubset(models[0].keys())
 

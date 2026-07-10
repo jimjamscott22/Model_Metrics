@@ -56,7 +56,10 @@ have these fields:
 | `released` | string  | Release label shown in the detail panel             | `"May 2026"`         |
 | `overall`  | number  | Overall score (Arena Elo in the current design)     | `1541`               |
 | `coding`   | number  | Coding score, e.g. SWE-bench Verified %             | `93.8`               |
+| `reasoning`| number  | Reasoning & logic score (MATH/GPQA composite), %    | `93.5`               |
+| `vision`   | number  | Vision & multimodal score (MMMU/VQAv2 composite), % | `90.5`               |
 | `longctx`  | number  | Long-context & agentic composite (0–100)            | `91`                 |
+| `context`  | number  | Maximum supported context window size in tokens     | `1000000`            |
 | `cost`     | number  | Blended cost, $ per 1M tokens                        | `12.0`               |
 | `speed`    | number  | Output speed, tokens/sec                             | `78`                 |
 
@@ -74,6 +77,9 @@ have these fields:
     "overall": 1541,
     "coding": 93.8,
     "longctx": 91,
+    "reasoning": 93.5,
+    "vision": 90.5,
+    "context": 1000000,
     "cost": 12.0,
     "speed": 78
   },
@@ -87,6 +93,9 @@ have these fields:
     "overall": 1522,
     "coding": 90.4,
     "longctx": 88,
+    "reasoning": 92.8,
+    "vision": 91.0,
+    "context": 1000000,
     "cost": 8.5,
     "speed": 95
   }
